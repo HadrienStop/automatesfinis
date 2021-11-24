@@ -8,37 +8,43 @@ Read an automaton and a word, returns:
 
 from automaton import Automaton, EPSILON, error, warn
 import sys
-import pdb # for debugging
+import pdb  # for debugging
+
 
 ##################
 
-def is_deterministic(a:'Automaton')->bool:
-  #TODO implement!
-  return True
-  
-##################
-  
-def recognizes(a:'Automaton', word:str)->bool:
-  #TODO implement!
-  return True 
+def is_deterministic(a: 'Automaton') -> bool:
+    isMoreThanOne = True
+    for (source, symb, dest) in a.transitions:
+        if len(symb) != 1:
+            isMoreThanOne = False
+
+    return isMoreThanOne
+
 
 ##################
 
-if __name__ == "__main__" :
-  if len(sys.argv) != 3:
-    usagestring = "Usage: {} <automaton-file.af> <word-to-recognize>"
-    error(usagestring.format(sys.argv[0]))
+def recognizes(a: 'Automaton', word: str) -> bool:
+    # TODO implement!
+    return True
 
-  automatonfile = sys.argv[1]  
-  word = sys.argv[2]
 
-  a = Automaton("dummy")
-  a.from_txtfile(automatonfile)
+##################
 
-  if not is_deterministic(a) :
-    print("ERROR")
-  elif recognizes(a, word):
-    print("YES")
-  else:
-    print("NO")
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        usagestring = "Usage: {} <automaton-file.af> <word-to-recognize>"
+        error(usagestring.format(sys.argv[0]))
 
+    automatonfile = sys.argv[1]
+    word = sys.argv[2]
+
+    a = Automaton("dummy")
+    a.from_txtfile(automatonfile)
+
+    if not is_deterministic(a):
+        print("ERROR")
+    elif recognizes(a, word):
+        print("YES")
+    else:
+        print("NO")
