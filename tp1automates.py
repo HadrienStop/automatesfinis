@@ -25,8 +25,8 @@ def is_deterministic(a: 'Automaton') -> bool:
 ##################
 
 def recognizes(a: 'Automaton', word: str) -> bool:
-    # TODO implement!
-    return True
+    for index in range(len(word)):
+
 
 
 ##################
