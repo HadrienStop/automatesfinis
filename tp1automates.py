@@ -14,20 +14,24 @@ import pdb  # for debugging
 ##################
 
 def is_deterministic(a: 'Automaton') -> bool:
-    isMoreThanOne = True
+    is_more_than_one = True
     for (source, symb, dest) in a.transitions:
         if len(symb) != 1:
-            isMoreThanOne = False
+            is_more_than_one = False
 
-    return isMoreThanOne
-
+    return is_more_than_one
 
 ##################
 
 def recognizes(a: 'Automaton', word: str) -> bool:
+    current_state = list(a.statesdict)[0]
     for index in range(len(word)):
-
-
+        if word[index] in list(a.statesdict[current_state].transitions):
+            current_state = str(list(a.statesdict[current_state].transitions[word[index]])[0])
+        else:
+            if word[index] != '%':
+                return False
+        return current_state in a.acceptstates
 
 ##################
 
