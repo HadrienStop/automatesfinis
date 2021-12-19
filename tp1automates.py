@@ -21,6 +21,7 @@ def is_deterministic(a: 'Automaton') -> bool:
 
     return is_more_than_one
 
+
 ##################
 
 def recognizes(a: 'Automaton', word: str) -> bool:
@@ -32,6 +33,7 @@ def recognizes(a: 'Automaton', word: str) -> bool:
             if word[index] != '%':
                 return False
         return current_state in a.acceptstates
+
 
 ##################
 
