@@ -36,10 +36,39 @@ def recognizes(a: Automaton, word: str) -> bool:
 
 
 ##################
+def epsilon_transition(a):
+    list_epsilon_transition = []
 
-def determinise(a: Automaton):
-    # Copy-paste or import from previous TPs
-    pass
+    for (source, symb, dest) in a.transitions:
+        if str(symb) == '%':
+            transit_lign = source, symb, dest
+            list_epsilon_transition.append(transit_lign)
+
+    return list_epsilon_transition
+
+
+def delete_epsilon_transition(a):
+    list = epsilon_transition(a)
+
+    for transition in a.transitions:
+        for element in list:
+            a.make_accept(element[0])
+            if transition[0] == element[2]:
+                a.add_transition(element[0], transition[1], element[2])
+    for value in list:
+        a.remove_transition(*value)
+
+
+def determinise(a):
+    delete_epsilon_transition(a)
+
+    for state in a.states:
+        new_states = [{a.initial.name}]
+        for transition in a.transitions:
+            if transition[0] == str(state):
+                print(state, transition)
+                a.add_transition(str(new_states[state]), transition[1], str(new_states[transition[2]]))
+                a.remove_transition(state, transition[1], transition[2])
 
 
 ##################
