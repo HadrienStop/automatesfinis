@@ -26,11 +26,11 @@ def is_deterministic(a: Automaton) -> bool:
 
 def recognizes(a: Automaton, word: str) -> bool:
     current_state = list(a.statesdict)[0]
-    for index in range(len(word)):
-        if word[index] in list(a.statesdict[current_state].transitions):
-            current_state = str(list(a.statesdict[current_state].transitions[word[index]])[0])
+    for i in range(len(word)):
+        if word[i] in list(a.statesdict[current_state].transitions):
+            current_state = str(list(a.statesdict[current_state].transitions[word[i]])[0])
         else:
-            if word[index] != '%':
+            if word[i] != '%':
                 return False
         return current_state in a.acceptstates
 
@@ -49,7 +49,6 @@ def epsilon_transition(a):
 
 def delete_epsilon_transition(a):
     list = epsilon_transition(a)
-
     for transition in a.transitions:
         for element in list:
             a.make_accept(element[0])
@@ -62,13 +61,13 @@ def delete_epsilon_transition(a):
 def determinise(a):
     delete_epsilon_transition(a)
 
-    for state in a.states:
-        new_states = [{a.initial.name}]
-        for transition in a.transitions:
-            if transition[0] == str(state):
-                print(state, transition)
-                a.add_transition(str(new_states[state]), transition[1], str(new_states[transition[2]]))
-                a.remove_transition(state, transition[1], transition[2])
+    for s in a.states:
+        nouvel_etat = [{a.initial.name}]
+        for t in a.transitions:
+            if t[0] == str(s):
+                print(s, t)
+                a.add_transition(str(nouvel_etat[s]), t[1], str(nouvel_etat[t[2]]))
+                a.remove_transition(s, t[1], t[2])
 
 
 ##################
@@ -128,8 +127,8 @@ def union(a1: Automaton, a2: Automaton) -> Automaton:
     nom_nouvel_etat = nouveaux_noms(a1_or_a2, a2)
     for (source, symbol, destination) in a2.transitions:
         a1_or_a2.add_transition(nom_nouvel_etat[source], symbol, nom_nouvel_etat[destination])
-    for state in a2.acceptstates:
-        a1_or_a2.make_accept(nom_nouvel_etat[state])
+    for s in a2.acceptstates:
+        a1_or_a2.make_accept(nom_nouvel_etat[s])
     nouvel_etat_initial = nouvel_etat(a1_or_a2)
     a1_or_a2.add_transition(nouvel_etat_initial, EPSILON, a1.initial.name)
     a1_or_a2.add_transition(nouvel_etat_initial, EPSILON, nom_nouvel_etat[a2.initial.name])
@@ -138,30 +137,14 @@ def union(a1: Automaton, a2: Automaton) -> Automaton:
 
 
 ##################
-def basic_automaton(symbol):
-    automaton = Automaton(symbol)
-    automaton.add_transition("0", symbol, "1")
-    automaton.make_accept("1")
-    return automaton
-
 
 def regexp_to_automaton(re: str) -> Automaton:
+    """
+  Moore's algorithm: regular expression `re` -> non-deterministic automaton
+  """
     postfix = RegExpReader(regexp).to_postfix()
     stack: List[Automaton] = []
-    for i in range(len(postfix)):
-        if postfix[i] == "*":
-            a = stack.pop()
-            stack.append(kleene(a))
-        elif postfix[i] == ".":
-            droite = stack.pop()
-            gauche = stack.pop()
-            stack.append(concat(gauche, droite))
-        elif postfix[i] == "+":
-            droite = stack.pop()
-            gauche = stack.pop()
-            stack.append(union(gauche, droite))
-        else:
-            stack.append(basic_automaton(postfix[i]))
+    # TODO implement!
     return stack[0]
 
 
