@@ -14,12 +14,13 @@ import pdb  # for debugging
 ##################
 
 def is_deterministic(a: 'Automaton') -> bool:
-    is_more_than_one = True
+    is_deterministic = True
     for (source, symb, dest) in a.transitions:
         if len(symb) != 1:
-            is_more_than_one = False
-
-    return is_more_than_one
+            is_deterministic = False
+        if symb == EPSILON:
+            is_deterministic = False
+    return is_deterministic
 
 
 ##################
