@@ -84,9 +84,9 @@ def nouvel_etat(a1: Automaton) -> str:
 
 def kleene(a1: Automaton) -> Automaton:
     a1star = a1.deepcopy()
-    a1star.name = a1.name + "*"
-    for state in a1star.acceptstates:
-        a1star.add_transition(state, EPSILON, a1.initial.name)
+    a1star.name = "a1star"
+    for s in a1star.acceptstates:
+        a1star.add_transition(s, EPSILON, a1.initial.name)
     nom_nouvel_etat = nouvel_etat(a1star)
     a1star.add_transition(nom_nouvel_etat, EPSILON, a1.initial.name)
     a1star.initial = a1star.statesdict[nom_nouvel_etat]
@@ -95,27 +95,27 @@ def kleene(a1: Automaton) -> Automaton:
 
 
 ##################
-def get_new_names(a1, a2):
-    new_names = {}
-    new_name = nouvel_etat(a1)
-    for state in a2.states:
-        new_names[state] = state
-        if (state in a1.states) or (state in list(new_names.values())):
-            new_names[state] = new_name
-            new_name = str(int(new_name) + 1)
-    return new_names
+def nouveaux_noms(a1, a2):
+    nouveaux_noms = {}
+    nouveau_nom = nouvel_etat(a1)
+    for s in a2.states:
+        nouveaux_noms[s] = s
+        if (s in a1.states) or (s in list(nouveaux_noms.values())):
+            nouveaux_noms[s] = nouveau_nom
+            nouveau_nom = str(int(nouveau_nom) + 1)
+    return nouveaux_noms
 
 
 def concat(a1: Automaton, a2: Automaton) -> Automaton:
     a1_a2 = a1.deepcopy()
-    a1_a2.name = a1.name + "_" + a2.name
-    nom_nouvel_etat = get_new_names(a1, a2)
+    a1_a2.name = "a1_a2"
+    nom_nouvel_etat = nouveaux_noms(a1, a2)
     for (source, symbol, destination) in a2.transitions:
         a1_a2.add_transition(nom_nouvel_etat[source], symbol, nom_nouvel_etat[destination])
-    for state in a2.acceptstates:
-        a1_a2.make_accept(nom_nouvel_etat[state])
-    for state in a1.acceptstates:
-        a1_a2.add_transition(state, EPSILON, nom_nouvel_etat[a2.initial.name])
+    for s in a2.acceptstates:
+        a1_a2.make_accept(nom_nouvel_etat[s])
+    for s in a1.acceptstates:
+        a1_a2.add_transition(s, EPSILON, nom_nouvel_etat[a2.initial.name])
         a1_a2.make_accept(a1.acceptstates, accepts=False)
     return a1_a2
 
@@ -124,8 +124,8 @@ def concat(a1: Automaton, a2: Automaton) -> Automaton:
 
 def union(a1: Automaton, a2: Automaton) -> Automaton:
     a1_or_a2 = a1.deepcopy()
-    a1_or_a2.name = a1.name + "+" + a2.name
-    nom_nouvel_etat = get_new_names(a1_or_a2, a2)
+    a1_or_a2.name = "a1_or_a2"
+    nom_nouvel_etat = nouveaux_noms(a1_or_a2, a2)
     for (source, symbol, destination) in a2.transitions:
         a1_or_a2.add_transition(nom_nouvel_etat[source], symbol, nom_nouvel_etat[destination])
     for state in a2.acceptstates:
@@ -138,14 +138,30 @@ def union(a1: Automaton, a2: Automaton) -> Automaton:
 
 
 ##################
+def basic_automaton(symbol):
+    automaton = Automaton(symbol)
+    automaton.add_transition("0", symbol, "1")
+    automaton.make_accept("1")
+    return automaton
+
 
 def regexp_to_automaton(re: str) -> Automaton:
-    """
-  Moore's algorithm: regular expression `re` -> non-deterministic automaton
-  """
     postfix = RegExpReader(regexp).to_postfix()
     stack: List[Automaton] = []
-    # TODO implement!
+    for i in range(len(postfix)):
+        if postfix[i] == "*":
+            a = stack.pop()
+            stack.append(kleene(a))
+        elif postfix[i] == ".":
+            droite = stack.pop()
+            gauche = stack.pop()
+            stack.append(concat(gauche, droite))
+        elif postfix[i] == "+":
+            droite = stack.pop()
+            gauche = stack.pop()
+            stack.append(union(gauche, droite))
+        else:
+            stack.append(basic_automaton(postfix[i]))
     return stack[0]
 
 

@@ -43,8 +43,7 @@ def remove_epsilon(a: Automaton):
         if symb == '%':
             for trans in list(a.statesdict[dest].transitions):
                 a.add_transition(source, trans, dest)
-            for trans_epsilon in list(a.statesdict[source].transitions):
-                a.remove_transition(source, "%", dest)
+            a.remove_transition(source, symb, dest)
         if dest in a.acceptstates:
             a.make_accept(source)
     a.remove_unreachable()
@@ -52,6 +51,10 @@ def remove_epsilon(a: Automaton):
 
 def reduce_transitions(a: Automaton):
     new_states = [set([a.initial.name])]
+
+    for (source, symb, dest) in a.transitions:
+      for trans in list(a.statesdict[dest].transitions):
+
 
 
 def determinise(a: Automaton):
