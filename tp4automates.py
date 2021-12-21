@@ -18,7 +18,6 @@ def is_deterministic(a: Automaton) -> bool:
     for (source, symb, dest) in a.transitions:
         if len(symb) != 1:
             is_more_than_one = False
-
     return is_more_than_one
 
 
@@ -36,9 +35,8 @@ def recognizes(a: Automaton, word: str) -> bool:
 
 
 ##################
-def epsilon_transition(a):
+def transitions_epsilon(a):
     list_epsilon_transition = []
-
     for (source, symb, dest) in a.transitions:
         if str(symb) == '%':
             transit_lign = source, symb, dest
@@ -47,8 +45,8 @@ def epsilon_transition(a):
     return list_epsilon_transition
 
 
-def delete_epsilon_transition(a):
-    list = epsilon_transition(a)
+def supprimer_epsilon(a):
+    list = transitions_epsilon(a)
     for transition in a.transitions:
         for element in list:
             a.make_accept(element[0])
@@ -59,7 +57,7 @@ def delete_epsilon_transition(a):
 
 
 def determinise(a):
-    delete_epsilon_transition(a)
+    supprimer_epsilon(a)
 
     for s in a.states:
         nouvel_etat = [{a.initial.name}]
